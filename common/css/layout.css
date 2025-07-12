@@ -1,0 +1,12 @@
+.Continer-Group {
+    padding: 2rem;
+}
+.control-panel {
+    margin-bottom: 2rem;
+}
+
+.Image-Group {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
