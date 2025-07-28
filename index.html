@@ -1,44 +1,460 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./common/css/root.css">
+    <title>Signature Generator</title>
+    <style>
+        /* Generator styles - not part of signature */
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
-        rel="stylesheet">
+        body {
+             font-family: "Inter", sans-serif;
 
-    <title>Employee Anniversary Tracker</title>
 
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .input-field {
+            width: 300px;
+            padding: 5px;
+        }
+
+        #copyButton {
+            background: #00587e;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            margin-top: 10px;
+            border: 1px solid #00587e;
+        }
+
+        #copyButton1 {
+            background: #fff;
+            color: #00587e;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            margin-top: 10px;
+            border: 1px solid #00587e;
+            margin-left: 0.5rem;
+        }
+
+        #copyButton1:hover {
+            background: #00587e;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            margin-top: 10px;
+            border: 1px solid #00587e;
+        }
+
+        .copyButton1 {
+            background: #fff;
+            color: #00587e;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            margin-top: 10px;
+            border: 1px solid #00587e;
+            margin-left: 0.5rem;
+        }
+
+        .copyButton1:hover {
+            background: #00587e;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            margin-top: 10px;
+            border: 1px solid #00587e;
+        }
+
+        #previewContainer {
+            margin-top: 20px;
+        }
+
+        #signaturePreview {
+            border: 1px dashed #ccc;
+            padding: 20px;
+            /* max-width: 600px; */
+            font-family: Calibri, Arial, sans-serif;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .language-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .show {
+            display: block;
+        }
+
+        h2,
+        h3 {
+            margin-bottom: 1rem;
+        }
+
+        .Item-Group{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4rem;
+            height: 100dvh;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="Continer-Group">
-        <div class="control-panel">
-            <div class="control-group">
-                <label for="excelFile"></label>
-                <input type="file" id="excelFile" accept=".xlsx, .xls">
-            </div>
-            <div class="control-group">
-                <label for="datePicker"></label>
-                <input type="text" id="datePicker" placeholder="DD/MM">
+    <div class="Item-Group">
+        <div class="Item">
+            <h2>Signature Generator</h2>
+
+            <div class="input-group">
+                <div class="input-label">Full Name</div>
+                <input type="text" id="nameInput" class="input-field" placeholder="Full name">
             </div>
 
+            <div class="input-group">
+                <div class="input-label">Department & Position</div>
+                <input type="text" id="departmentInput" class="input-field" placeholder="Department name">
+            </div>
 
-            <button id="processBtn" class="Main-Button">Process Data</button>
+            <div class="input-group">
+                <div class="input-label">Phone Extension</div>
+                <input type="text" id="extensionInput" class="input-field" maxlength="3" placeholder="123"
+                    style="width:100px;">
+            </div>
+
+            <div class="input-group">
+                <div class="input-label">Mobile Number</div>
+                <input type="text" id="mobileInput" class="input-field" maxlength="9" placeholder="501234567"
+                    style="width:150px;">
+            </div>
+
+            <button id="copyButton">Copy Signature</button>
+            <button id="copyButton1">Video Tutorial</button>
+
+            <div class="language-dropdown">
+                <button id="translateButton" class="copyButton1">Translate</button>
+                <div id="languageDropdown" class="dropdown-content">
+                    <a href="#" data-lang="en">English</a>
+                    <a href="#" data-lang="az">Azerbaijani</a>
+                    <a href="#" data-lang="ru">Russian</a>
+
+                </div>
+            </div>
         </div>
 
-        <div class="Image-Group" id="resultContainer">
-            <!-- Results will appear here -->
+        <div class="Item">
+            <div id="previewContainer">
+                <h3>Preview:</h3>
+                <div id="signaturePreview"></div>
+            </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const inputs = {
+                name: document.getElementById('nameInput'),
+                department: document.getElementById('departmentInput'),
+                extension: document.getElementById('extensionInput'),
+                mobile: document.getElementById('mobileInput')
+            };
 
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="./common/js/main.js"></script>
+            const copyButton = document.getElementById('copyButton');
+            const translateButton = document.getElementById('translateButton');
+            const languageDropdown = document.getElementById('languageDropdown');
+            const preview = document.getElementById('signaturePreview');
+
+            let currentLanguage = 'en';
+            const translations = {
+                en: {
+                    coName: "ABSHERON LOGISTICS CENTER",
+                    location: "57, Khojahasan road, Garadagh district,",
+                    addressLine2: "AZ1063, Baku, Azerbaijan",
+                    bestRegards: "Best regards,",
+                    subsidiaries: "SUBSIDIARIES",
+                    Phone: 'Phone',
+                    Mobile: 'Mobile',
+                    disclaimer: `Unless expressly stated otherwise, this email and any attachments may contain confidential
+                    or legally privileged information intended solely for the designated recipient(s). Any
+                    unauthorized review, use, disclosure, distribution, copying, or modification is strictly
+                    prohibited and may result in legal liability. If you are not the intended recipient, please
+                    notify the sender immediately and delete this message from your system. Within the bounds of
+                    applicable law, the sender may monitor electronic communications transmitted through its
+                    internal and external networks to ensure compliance with internal policies and for
+                    legitimate business purposes. The sender accepts no liability for any unauthorized handling
+                    of this communication.`,
+                    environment: "Please consider the environment before printing this email"
+                },
+                az: {
+                    coName: "ABŞERON LOGİSTİKA MƏRKƏZİ",
+                    location: "57, Xocasən yolu, Qaradağ rayonu,",
+                    addressLine2: "AZ1063, Bakı, Azərbaycan",
+                    bestRegards: "Hörmətlə,",
+                    subsidiaries: "TÖRƏMƏ ŞİRKƏTLƏR",
+                    Phone: 'Telefon',
+                    Mobile: 'Mobil',
+                    disclaimer: `Açıq şəkildə başqa cür göstərilmədiyi təqdirdə, bu e-poçt və ona əlavə edilmiş bütün sənədlər yalnız müəyyən edilmiş qəbuledici(lər) üçün nəzərdə tutulmuş məxfi və ya qanuni imtiyazlı məlumat ola bilər. 
+                    İcazəsiz nəzərdən keçirmə, istifadə, açıqlama, paylama, köçürmə və ya dəyişiklik ciddi şəkildə qadağandır və qanuni məsuliyyətə səbəb ola bilər. 
+                    Əgər siz bu mesajın nəzərdə tutulduğu qəbuledici deyilsinizsə, xahiş edirik dərhal göndərənə xəbər verin və bu mesajı sisteminizdən silin. 
+                    Tətbiq olunan qanunlar çərçivəsində, göndərən şirkət daxili siyasətlərə uyğunluğu təmin etmək və qanuni biznes məqsədləri üçün daxili və xarici şəbəkələr vasitəsilə ötürülən elektron rabitəni nəzarət edə bilər. 
+                    Göndərən şirkət bu rabitənin icazəsiz istifadəsi ilə bağlı heç bir məsuliyyət daşımır.`,
+                    environment: "Zəhmət olmasa bu e-poçtu çap etməzdən əvvəl ətraf mühitə düşünün"
+                },
+                ru: {
+                    coName: "ЛОГИСТИЧЕСКИЙ ЦЕНТР АБШЕРОН",
+                    location: "57, Ходжасанская дорога, район Гарадаг,",
+                    addressLine2: "AZ1063, Баку, Азербайджан",
+                    bestRegards: "С уважением,",
+                    subsidiaries: "ДОЧЕРНИЕ КОМПАНИИ",
+                    Phone: 'Телефон',
+                    Mobile: 'Мобильный',
+                    disclaimer: `Если не указано иное, данное электронное письмо и любые прикрепленные к нему документы могут содержать конфиденциальную или привилегированную информацию, предназначенную исключительно для указанного получателя(ей). 
+                    Любой несанкционированный просмотр, использование, раскрытие, распространение, копирование или изменение строго запрещены и могут повлечь за собой юридическую ответственность. 
+                    Если вы не являетесь предполагаемым получателем, пожалуйста, немедленно уведомите отправителя и удалите это сообщение из вашей системы. 
+                    В рамках применимого законодательства отправитель может контролировать электронные сообщения, передаваемые через его внутренние и внешние сети, для обеспечения соблюдения внутренней политики и в законных деловых целях. 
+                    Отправитель не несет ответственности за любое несанкционированное обращение с данным сообщением.`,
+                    environment: "Пожалуйста, подумайте об окружающей среде перед печатью этого письма"
+                },
+
+            };
+
+            // Update preview on any input change
+            Object.values(inputs).forEach(input => {
+                input.addEventListener('input', generateSignature);
+            });
+
+            // Toggle language dropdown
+            translateButton.addEventListener('click', function () {
+                languageDropdown.classList.toggle('show');
+            });
+
+            // Close dropdown when clicking outside
+            window.addEventListener('click', function (event) {
+                if (!event.target.matches('#translateButton')) {
+                    if (languageDropdown.classList.contains('show')) {
+                        languageDropdown.classList.remove('show');
+                    }
+                }
+            });
+
+            // Handle language selection
+            document.querySelectorAll('.dropdown-content a').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    currentLanguage = this.getAttribute('data-lang');
+                    generateSignature();
+                    languageDropdown.classList.remove('show');
+                });
+            });
+
+            // Initial generation
+            generateSignature();
+
+            function formatMobileNumber(mobile) {
+                // Remove all non-digit characters
+                mobile = mobile.replace(/\D/g, '');
+
+                // Remove leading country codes and leading zero
+                if (mobile.startsWith('994')) {
+                    mobile = mobile.substring(3);
+                } else if (mobile.startsWith('00994')) {
+                    mobile = mobile.substring(5);
+                } else if (mobile.startsWith('0')) {
+                    mobile = mobile.substring(1);
+                }
+
+                // Initialize operator prefix
+                let prefix = '--';
+
+                // List of known prefixes
+                const knownPrefixes = ['50', '51', '55', '70', '77', '99', '60', '10'];
+
+                // Check and extract prefix
+                for (let p of knownPrefixes) {
+                    if (mobile.startsWith(p)) {
+                        prefix = p;
+                        mobile = mobile.substring(p.length);
+                        break;
+                    }
+                }
+
+                // Format remaining 7-digit number
+                let formatted = '--- -- --';
+                if (mobile.length > 0) formatted = mobile.substring(0, 3);
+                if (mobile.length > 3) formatted += ' ' + mobile.substring(3, 5);
+                if (mobile.length > 5) formatted += ' ' + mobile.substring(5, 7);
+
+                return { prefix, formatted };
+            }
+
+            // Function to translate text using Google Translate API (mock implementation)
+            async function translateText(text, targetLang) {
+
+                // Mock translations for demonstration
+                const mockTranslations = {
+                    "Employee name": {
+                        az: "İşçinin adı",
+                        ru: "Имя сотрудника",
+
+                    },
+                    "Department name": {
+                        az: "Şöbə adı",
+                        ru: "Имя отдела",
+
+                    }
+                };
+
+                // Check if we have a mock translation for this text
+                if (mockTranslations[text] && mockTranslations[text][targetLang]) {
+                    return mockTranslations[text][targetLang];
+                }
+
+                return text; // Return original text if no translation available
+            }
+
+            async function generateSignature() {
+                const name = inputs.name.value || 'Full Name';
+                const department = inputs.department.value || 'Department Name';
+                const extension = inputs.extension.value.padEnd(3, '-').substring(0, 3);
+                const { prefix, formatted } = formatMobileNumber(inputs.mobile.value);
+                const lang = translations[currentLanguage];
+
+
+                const translatedName = name;
+                const translatedDepartment = department;
+
+                const signatureHTML = `
+<!--[if gte mso 9]>
+<xml>
+  <o:OfficeDocumentSettings>
+    <o:AllowPNG/>
+    <o:PixelsPerInch>96</o:PixelsPerInch>
+  </o:OfficeDocumentSettings>
+</xml>
+<![endif]-->
+<!--[if mso]>
+<style type="text/css">
+  body, table, td {font-family: Calibri, Arial, sans-serif !important;}
+  span, p, a, strong {font-family: Calibri, Arial, sans-serif !important;}
+  .outlook-reset * {mso-line-height-rule: exactly;}
+</style>
+<![endif]-->
+<div class="outlook-reset" style="font-family:Calibri,Arial,sans-serif; font-size:12px; color:#333; mso-line-height-rule: exactly;">
+<table border="0" cellpadding="0" cellspacing="0" width="600" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">
+    <tr><td style="padding-bottom:10px; font-family:Calibri,Arial,sans-serif; mso-line-height-rule: exactly;">${lang.bestRegards}</td></tr>
+    <tr><td style="padding-bottom:10px; font-family:Calibri,Arial,sans-serif; mso-line-height-rule: exactly;"><strong style="font-weight:bold; font-family:Calibri,Arial,sans-serif;">${translatedName}</strong></td></tr>
+    <tr><td style="padding-bottom:10px; font-family:Calibri,Arial,sans-serif; mso-line-height-rule: exactly;">${translatedDepartment}</td></tr>
+    <tr><td style="padding-bottom:10px; font-family:Calibri,Arial,sans-serif; mso-line-height-rule: exactly;"><img src="./assets/img/Absheron_Logistika_logo_png_main.png" width="160" style="border:none; display:block;"></td></tr>
+    <tr><td style="padding-bottom:10px; font-family:Calibri,Arial,sans-serif; mso-line-height-rule: exactly;"><strong style="font-size:13px; font-weight:bold; font-family:Calibri,Arial,sans-serif;">${lang.coName}</strong></td></tr>
+    <tr><td style="padding-bottom:5px; font-family:Calibri,Arial,sans-serif; mso-line-height-rule: exactly;"><a href="https://maps.google.com" style="color:#00587e; text-decoration:none; font-family:Calibri,Arial,sans-serif;">${lang.location}</a></td></tr>
+    <tr><td style="padding-bottom:10px; font-family:Calibri,Arial,sans-serif; mso-line-height-rule: exactly;"><a href="https://maps.google.com" style="color:#00587e; text-decoration:none; font-family:Calibri,Arial,sans-serif;">${lang.addressLine2}</a></td></tr>
+    <tr><td style="padding-bottom:10px; font-family:Calibri,Arial,sans-serif; mso-line-height-rule: exactly;">${lang.Phone}: (+994 12) 404 76 00 (ext. ${extension})</td></tr>
+    <tr><td style="padding-bottom:10px; font-family:Calibri,Arial,sans-serif; mso-line-height-rule: exactly;">${lang.Mobile}: (+994 ${prefix}) ${formatted}</td></tr>
+    <tr><td style="padding-bottom:15px; font-family:Calibri,Arial,sans-serif; mso-line-height-rule: exactly;"><a href="https://www.absheronport.az" style="color:#00587e; text-decoration:none; font-family:Calibri,Arial,sans-serif;">www.absheronport.az</a></td></tr>
+    <tr><td style="padding-bottom:15px; font-family:Calibri,Arial,sans-serif; mso-line-height-rule: exactly;">
+        <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">
+            <tr>
+                <td style="padding-right:10px;"><a href="#"><img src="./assets/img/facebook.png" width="24" style="border:none; display:block;"></a></td>
+                <td style="padding-right:10px;"><a href="#"><img src="./assets/img/x.png" width="24" style="border:none; display:block;"></a></td>
+                <td style="padding-right:10px;"><a href="#"><img src="./assets/img/linkedin.png" width="24" style="border:none; display:block;"></a></td>
+                <td style="padding-right:10px;"><a href="#"><img src="./assets/img/instagram.png" width="24" style="border:none; display:block;"></a></td>
+                <td><a href="#"><img src="./assets/img/whatsapp.png" width="24" style="border:none; display:block;"></a></td>
+            </tr>
+        </table>
+    </td></tr>
+    <tr><td style="font-size:13px; padding-bottom:5px; font-family:Calibri,Arial,sans-serif; mso-line-height-rule: exactly;">${lang.subsidiaries}</td></tr>
+    <tr><td style="padding-bottom:15px; font-family:Calibri,Arial,sans-serif; mso-line-height-rule: exactly;"><img src="./assets/img/SUBSIDIARIES.png" width="250" style="border:none; display:block;"></td></tr>
+    <tr><td style="padding-bottom:10px; font-size:9px; color:#666; text-align:justify; line-height:1.4; font-family:Calibri,Arial,sans-serif; mso-line-height-rule: exactly;" width="150px">
+        ${lang.disclaimer}
+    </td></tr>
+    <tr><td style="font-family:Calibri,Arial,sans-serif; mso-line-height-rule: exactly;">
+        <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;">
+            <tr>
+                <td><img src="./assets/img/tree.png" width="10" style="border:none; display:block;"></td>
+                <td style="padding-left:5px; font-size:9px; color:#84C54C; font-family:Calibri,Arial,sans-serif;">${lang.environment}</td>
+            </tr>
+        </table>
+    </td></tr>
+</table>
+</div>
+                `;
+
+                preview.innerHTML = signatureHTML;
+            }
+
+            copyButton.addEventListener('click', function () {
+                // Create a temporary div with the content
+                const tempDiv = document.createElement('div');
+                tempDiv.style.position = 'absolute';
+                tempDiv.style.left = '-9999px';
+                tempDiv.innerHTML = preview.innerHTML;
+                document.body.appendChild(tempDiv);
+
+                // Select the content
+                const range = document.createRange();
+                range.selectNode(tempDiv);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+
+                try {
+                    // Copy the content
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        copyButton.textContent = 'Copied!';
+                        setTimeout(() => {
+                            copyButton.textContent = 'Copy Signature';
+                        }, 2000);
+                    } else {
+                        alert('Could not copy signature. Please try Ctrl+C.');
+                    }
+                } catch (err) {
+                    alert('Error copying signature: ' + err);
+                } finally {
+                    // Clean up
+                    window.getSelection().removeAllRanges();
+                    document.body.removeChild(tempDiv);
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
